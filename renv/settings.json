@@ -1,7 +1,14 @@
 {
   "bioconductor.version": null,
-  "external.libraries": [],
-  "ignored.packages": [],
+  "external.libraries": [
+    "/Users/dlebauer/R/x86_64-pc-linux-gnu-library/4.4",
+    "/Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/library"
+  ],
+  "ignored.packages": [
+    "usethis",
+    "devtools",
+    "rrtools"
+  ],
   "package.dependency.fields": [
     "Imports",
     "Depends",
