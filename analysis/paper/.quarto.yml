@@ -1,0 +1,50 @@
+project:
+  type: article
+
+title: "A simplified biogeochemistry model to represent agriculture and estimate greenhouse gas balance of ecosystems"
+author:
+  - David LeBauer
+  - Michael Longfritz
+  - Chris Black
+  - Michael Dietze
+  - John Zobitz
+
+institute:
+  - tla:
+      name: The LeBauer Approach, LLC
+      address: 2911 E Canyon Bend St, Tucson, AZ
+  - ua: 
+      name: University of Arizona
+  - self:
+      name: Independent Consultant
+  - paf:
+      name: Pools and Fluxes, LLC
+  - bu:
+      name: Boston University
+  - aug:
+      name: Augsburg University
+
+title-block-published: "Last updated"  
+date-format: long
+format: 
+  docx:
+    reference-doc: "analysis/templates/template.docx" # Adjust path as needed
+execute:
+  echo: true
+  warning: false
+  message: false
+  comment: "#>"
+  fig-path: "analysis/figures/"
+  fig-dpi: 600
+filters:
+  - analysis/templates/scholarly-metadata.lua
+  - analysis/templates/author-info-blocks.lua
+  - analysis/templates/pagebreak.lua
+bibliography: analysis/references.bib
+csl: "analysis/templates/journal-of-archaeological-science.csl" # Adjust path as needed
+abstract: |
+  Text of abstract
+keywords: |
+  keyword 1; keyword 2; keyword 3
+highlights: |
+  These are the highlights.
