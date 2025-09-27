@@ -1,0 +1,90 @@
+---
+title: "A simplified biogeochemistry model to represent agriculture and estimate greenhouse gas balance of ecosystems"
+author:
+  - David LeBauer:
+      institute: tla, ua
+  - Michael Longfritz:
+      institute: self
+  - Chris Black:
+      institute: paf
+  - Michael Dietze:
+      institute: bu
+  - John Zobitz:
+      institute: aug
+date: now
+---
+
+<!-- The actual document text starts here: -->
+
+# Introduction
+
+Here is a citation [@Marwick2017]
+
+# Background
+
+# Methods
+
+# Results
+
+<!-- Here's some example analysis code: -->
+
+```{r}
+#| label: get-data
+#| eval: false
+# Note the path that we need to use to access our data files when rendering this document
+my_data <- read.csv(here::here('analysis/data/raw_data/my_csv_file.csv'))
+```
+
+```{r}
+#| label: fig-demo-plot
+#| fig-cap: "A plot of random numbers"
+plot(rnorm(10))
+```
+
+@fig-demo-plot shows how we can have a caption and cross-reference for a plot. Note that figure label and cross-references must both be prefixed with `fig-`
+
+```{r}
+#| label: demo-inline-code
+#| echo: false
+x <- round(pi, 2)
+```
+
+Here is an example of inline code `r x` in the middle of a sentence.
+
+# Discussion
+
+# Conclusion
+
+# Acknowledgements
+
+<!-- The following line inserts a page break  -->
+
+\newpage
+
+# References
+
+<!-- The following line ensures the references appear here for the MS Word or HTML output files, rather than right at the end of the document (this will not work for PDF files):  -->
+
+::: {#refs}
+:::
+
+\newpage
+
+### Colophon
+
+This report was generated on `r Sys.time()` using the following computational environment and dependencies:
+
+```{r}
+#| label: colophon
+#| cache: false
+
+# which R packages and versions?
+if ("devtools" %in% installed.packages()) devtools::session_info()
+```
+
+The current Git commit details are:
+
+```{r}
+# what commit is this file at? 
+if ("git2r" %in% installed.packages() & git2r::in_repository(path = ".")) git2r::repository(here::here())  
+```

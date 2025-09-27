@@ -1,5 +1,5 @@
 ---
-title: "A simplified biogeochemistry model to represent agriculture and estimate greenhouse gas balance of ecosystems"
+title: "SIPNET 2: A lightweight, extensible model for coupled C–N–H₂O–GHG dynamics in managed ecosystems"
 author:
   - David LeBauer:
       institute: tla, ua
@@ -14,77 +14,391 @@ author:
 date: now
 ---
 
-<!-- The actual document text starts here: -->
+## Abstract
 
-# Introduction
+Understanding ecosystem responses to natural variability and human management requires models that capture coupled carbon–water–nutrient dynamics. We present SIPNET 2, a major update to the Simplified Photosynthesis and Evapotranspiration model, expanding capability beyond the 1.x lineage to represent managed and semi‑managed systems. Four advances are introduced: (i) a modular agronomic event framework (planting, harvest, tillage, fertilization, irrigation) that routes episodic fluxes; (ii) a newly implemented nitrogen cycle module (fertilization inputs; mineralization–immobilization; volatilization; plant uptake; leaching) with optional C:N coupling; (iii) greenhouse gas extensions for N₂O and CH₄ emissions with moisture and temperature controls; and (iv) run‑time configuration that exposes structural options at the command line. Here we highlight newly added mechanisms. The architecture remains lightweight and open‑source, emphasizing transparency, testability, and integration with model–data workflows (e.g., PEcAn). Together, these features allow SIPNET 2 to represent biogeochemical feedbacks and human interventions, positioning it as a versatile tool for evaluating coupled carbon–nutrient–GHG interactions and supporting regional assessments under land‑use and climate change.
 
-Here is a citation [@Marwick2017]
+- emphasize simpilicity
 
-# Background
+---
 
-# Methods
+## Keywords
 
-# Results
+* ecosystem model; SIPNET; carbon–nitrogen coupling; greenhouse gases; managed ecosystems; agronomic events
 
-<!-- Here's some example analysis code: -->
+---
 
-```{r}
-#| label: get-data
-#| eval: false
-# Note the path that we need to use to access our data files when rendering this document
-my_data <- read.csv(here::here('analysis/data/raw_data/my_csv_file.csv'))
-```
+## Introduction
 
-```{r}
-#| label: fig-demo-plot
-#| fig-cap: "A plot of random numbers"
-plot(rnorm(10))
-```
+* Lineage and motivation
 
-@fig-demo-plot shows how we can have a caption and cross-reference for a plot. Note that figure label and cross-references must both be prefixed with `fig-`
+  * SIPNET origins in PnET; early 1.x applications with model–data fusion (Braswell 2005; Sacks 2006, 2007; Zobitz 2008, 2014)
+  * Need for a lightweight yet extensible model that can effectively represent managed croplands/rangelands as well as natural ecosystems
+  * Emphasis on simplicity and ease of use
 
-```{r}
-#| label: demo-inline-code
-#| echo: false
-x <- round(pi, 2)
-```
+* Gap analysis
 
-Here is an example of inline code `r x` in the middle of a sentence.
+  * Many models: DayCent/DNDC/CLM offer rich detail but high complexity and cost
+  * Prior SIPNET lacked explicit management, N cycling, and GHG modules; limited run‑time configurability
+  * Conceptual comparison vs DayCent, DNDC, CLM(CN), PnET (scope; time‑step; state variables; extensibility)
 
-# Discussion
+* Objectives
 
-# Conclusion
+  * Document SIPNET 2 scientific/engineering advances relative to 1.x
+  * Demonstrate applicability to managed/semi‑managed ecosystems
+  * Demonstrate calibration, evaluation, and uncertainty quantification
 
-# Acknowledgements
 
-<!-- The following line inserts a page break  -->
+---
 
-\newpage
+## Model Overview
 
-# References
+* Design philosophy
 
-<!-- The following line ensures the references appear here for the MS Word or HTML output files, rather than right at the end of the document (this will not work for PDF files):  -->
+  * Minimal complexity
+  * Sufficient to represent outcomes of management interventions
 
-::: {#refs}
-:::
+* Existing core C-H2O coupling (summarize, point to docs/model-structure.md)
 
-\newpage
+  * Carbon pools (leaves, wood, roots [optional], litter, soil)
+  * Fluxes (GPP, allocation, autotrophic respiration, heterotrophic respiration, litterfall, decomposition)
+  * Water balance (soil water holding capacity, evapotranspiration/transpiration, drainage, interception)
+  * Time step: typically run hourly but can run at any time step up to 2/d
 
-### Colophon
+* Inputs/outputs
 
-This report was generated on `r Sys.time()` using the following computational environment and dependencies:
+  * Drivers
+    * Meteorology
+    * Management events (new)
+  * Initial conditions
+    * soil
+    * vegetation
+  * Parameters
+  * Outputs
+    * States
+    * Fluxes
+    * Event Logs
 
-```{r}
-#| label: colophon
-#| cache: false
+---
 
-# which R packages and versions?
-if ("devtools" %in% installed.packages()) devtools::session_info()
-```
+## New Developments in SIPNET 2
 
-The current Git commit details are:
+### Agronomic Events
 
-```{r}
-# what commit is this file at? 
-if ("git2r" %in% installed.packages() & git2r::in_repository(path = ".")) git2r::repository(here::here())  
-```
+ Agronomic Event Framework
+
+  * Problem: management not representable in 1.x
+  * Implementation: event file parsing; event types (planting/emergence, fertilization, irrigation, tillage, harvest)
+  * Flux routing: 
+    * harvest: biomass removal
+    * planting: initial biomass, phenology reset
+    * tillage: soil disturbance multipliers 
+    * water additions
+  * Implications: discontinuities captured; enables validation against observational and experimental managed systems; scenario-based projections
+
+### Nitrogen Cycle and GHG Fluxes
+
+* Nitrogen Cycle Module
+
+  * Primary objectives: 
+    * represent N2O emissions
+    * represent N additions via fertilization and organic matter addition 
+  * What does a simple N cycle mean? Consistent with simple design philosophy.
+  * Minimum requirements
+    * N availability limits C uptake
+    * volatilization of mineral N to atmosphere
+  * Implementation: mineral N pool; mineralization–immobilization; plant N uptake; leaching; volatilization; fixation
+  * C–N coupling: dynamic C:N for litter/soil (D_CN scalar); 
+    * N limitation indicator
+    * feedbacks to decomposition
+
+* Greenhouse Gas Extensions (N₂O, CH₄)
+
+  * N₂O: moisture/temperature scalars; fertilizer‑pulse response; partitioning
+    * only volatilization; no nitrification/denitrification partitioning [until sufficient data to demonstrate need]
+  * CH₄: production in anoxic soils
+
+* Carbon–Nitrogen Coupling
+
+  * Stoichiometric allocation with flexible C:N pools; 
+  * feedbacks to decomposition and immobilization
+    * D_CN function references in docs
+
+* Moisture & Temperature Dependency Functions
+
+  * Existing
+    * Parabolic/empirical photosynthesis temperature response
+    * Q10 respiration
+    * Soil moisture scalars
+  * New
+    * Anaerobic
+    * CN feedbacks
+
+* Tillage Effect Function
+
+  * Disturbance multiplier D_till with exponential decay; accumulation across events; bounds and time scale
+
+* Irrigation Modes
+
+  * Canopy vs soil application; interception/throughfall logic; [future] flooding/paddy mode
+* 6.8 Run‑Time Configuration & Software Engineering
+
+
+### Parameterization
+
+
+  * Categories: photosynthesis, respiration, allocation, hydrology, N cycling, GHG
+  * Point to parameter file; table placeholder (names, symbols, units, defaults, ranges)
+
+### Updates from SIPNET 1.x
+
+  * Software Engineering Improvements
+
+    * Modular codebase; event-driven architecture; run-time configuration via command line; CI/CD with tests and docs
+    * Compile‑time → run‑time flags; structured CLI; modular source layout
+  * Tests (smoke/unit), docs pipeline, coding standards; reproducible examples
+* Version Transition Summary
+
+  * Concise mapping: SIPNET 1.x → SIPNET 2 features; backward‑compatibility notes
+
+---
+
+### Mathematical Formulation (Pointers to Documentation)
+
+* Existing SIPNET 1.x equations (summarize, point to docs/model-structure.md)
+* New equations
+  * Agronomic events (planting, harvest, tillage, fertilization, irrigation)
+  * Nitrogen cycle (mineralization–immobilization, plant uptake, leaching, volatilization)
+  * GHG fluxes (N₂O emissions, CH₄ production)
+  * C–N coupling (dynamic C:N ratios, feedbacks to decomposition)
+  * Moisture and temperature dependency functions (anaerobic conditions, CN feedbacks)
+  * Tillage effect function (disturbance multiplier with decay)
+
+---
+
+### Data & Experimental Design
+
+* Sites/Ecosystems
+  * Representative managed/semi‑managed: irrigated CA cropland; rice paddy; orchard
+
+* Management scenarios
+  * mineral vs organic fertilization
+  * irrigation regimes (timing, amount)
+  * tillage vs no‑till
+  * crop types & rotations 
+    * reduced fertilized vs tilled vs multi‑event sequences; event timing windows
+  * representing mixed systems
+
+* GHG evaluation datasets
+  * Chambers for N₂O/CH₄
+  * eddy covariance
+  * ancillary soil data
+
+* Simulation protocol
+  * Sites
+  * Spin‑up/initial conditions; 
+  * meteorological drivers; 
+  * ensemble size; 
+  * run length
+
+---
+
+### Sensitivity Analysis
+
+* Approaches
+  * One‑at‑a‑time parameter sensitivity
+  * Global Sobol analysis
+    * Events
+    * Weather
+    * Soils
+* Outputs
+* Focus parameters
+  * C vs N vs GHG: moisture scalars, Q10, allocation, N mineralization, fertilizer response, tillage decay
+  * Photosynthesis
+  * Respiration
+  * Hydrology
+  * N cycling
+  * GHG
+* Informative Priors
+  * following LeBauer et al 2013 conservatively informative
+  * Literature/site‑based ranges
+
+### Calibration
+
+* Framework
+  * PEcAn Bayesian MCMC with GP emulator
+  * Targets: 
+    * primary: SOC, NEE, N₂O,CH₄
+    * secondary: ET, LAI, biomass
+* Diagnostics
+  * Convergence checks 
+  * posterior predictive checks 
+  * cross‑validation splits
+
+---
+
+### Validation & Evaluation
+
+* Metrics
+  * RMSE, Bias, MAE, R², 
+  * Taylor diagram rationale
+* Targets
+  * Practice change deltas SOC, NEE, N₂O, CH₄
+* Design
+  * TBD
+---
+
+### Uncertainty Analysis
+
+* Sources
+  * Parameters
+  * initial conditions 
+  * management events
+  * meteorological forcing 
+  * structure (?)
+* Propagation
+  * Ensemble runs
+  * scenario matrix 
+  * structural option toggles (?)
+* Attribution
+  * Variance decomposition by group (C, N, H₂O, GHG)
+
+### Computational Performance (?)
+
+* This could be very brief part of results
+  * Runtime per site per year; ensemble throughput; parallelization notes
+* Parameter DA workflows
+  * Suitability for large ensembles, high res spatial coverage
+
+## Results
+
+
+### Sensitivity Analysis
+
+### Calibration
+
+### Validation & Evaluation
+
+### Computational Performance
+
+## Discussion
+
+
+---
+
+## Reproducibility & Open Science
+
+* Versioning
+
+  * CHANGELOG (2.0.0 highlights); semantic tags; release artifacts
+* Tests & docs
+
+  * Smoke/unit; mkdocs build; example configs; CI badges
+* Code style
+
+  * clang‑format/tidy; contributor guide; issue/PR templates
+
+---
+
+## Discussion
+
+* Scientific implications
+  * Managed ecosystems: capturing episodic events and feedbacks
+  * Trade‑offs: simplicity vs detail; where parsimony holds/ breaks
+* Limitations
+  * Soil layering; explicit microbes; N₂O partitioning; CH₄ transport; phenology generality
+* Future work (from wish‑list & alt‑ideas)
+  * Priority roadmap: (1) nitrification/denitrification partition; (2) anaerobic moisture functions; (3) paddies/flooding; (4) multi‑layer soil; (5) oxidation/transport for CH₄
+
+---
+
+## Conclusions
+
+* Synthesis
+  * SIPNET 2 advances + demonstrated extensibility
+* Use cases
+  * Inventories, scenario testing, data assimilation at scale
+
+---
+
+## Code & Data Availability
+
+* Repository & license
+  * URL; version, doi; BSD‑3‑Clause
+
+---
+
+## Author Contributions (CRediT)
+
+* Conceptualization; Methodology; Software; Validation; Formal Analysis; Investigation; Resources; Data Curation; Writing – Original Draft; Writing – Review & Editing; Visualization; Supervision; Project Administration; Funding Acquisition [TO_FILL]
+
+---
+
+## Acknowledgments
+
+* Funding; collaborators; data providers
+
+---
+
+## References
+
+ (Braswell 2005; Sacks 2006, 2007; Zobitz 2008, 2014; etc.) [REF DETAILS NEEDED]
+
+---
+
+## Appendices / Supplementary Material
+
+### Appendix A: Full Equation Set
+
+* Extracted from docs/model-structure.md; equation tags; symbol glossary
+
+### Appendix B: Parameter Table
+
+* Names, symbols, units, defaults, priors, sources
+
+### Appendix C: Scenario / Forcing Table
+  * Sites, drivers, events
+
+
+---
+
+## Tables & Figures (Captions + Placeholders)
+
+* Table 1: Core state variables, fluxes, and parameters (symbols; units; brief definitions) [PLACEHOLDER]
+* Table 2: SIPNET 1.x vs 2.0 feature comparison (capabilities; notes) [PLACEHOLDER]
+* Table 3: Calibration parameter set and prior ranges (by module) [PLACEHOLDER]
+* Table 4: Management scenario definitions (event sequences; timings; amounts) [PLACEHOLDER]
+* Table 5: Performance metrics across sites/periods (GPP, NEE, Reco, N₂O, CH₄) [PLACEHOLDER]
+* Figure 1: Schematic of C–N–H₂O–GHG pools and fluxes; new modules highlighted [PLACEHOLDER]
+* Figure 2: Event handler timeline (planting → fertilization → irrigation → tillage → harvest) [PLACEHOLDER]
+* Figure 3: Global sensitivity indices (Sobol first‑order & total) for key outputs [PLACEHOLDER]
+* Figure 4: Uncertainty envelopes for NEE/N₂O under alternative moisture functions [PLACEHOLDER]
+* Figure 5: Posterior distributions (example calibration) [PLACEHOLDER]
+* Figure 6: Modeled vs observed time series at representative sites [PLACEHOLDER]
+
+---
+
+## Assumptions Requiring Confirmation
+
+* Time step in 2.0 runs [VERIFY: hourly vs half‑daily vs daily]
+* N module scope: nitrification/denitrification partitioning implemented vs proposed [VERIFY]
+* CH₄ oxidation/transport implemented vs planned [VERIFY]
+* Event precedence rules when multiple events fall on same date [VERIFY]
+
+---
+
+## Missing Information / Author Action Items
+
+* Confirm defaults and ranges for new N and GHG parameters [TO_FILL]
+* Provide site lists, drivers, event files, and evaluation datasets [TO_FILL]
+* Finalize reproducibility commands and CI job names [TO_FILL]
+* Fill reference details and DOIs; ensure equation/notation crosswalk [TO_FILL]
+
+---
+
+## Risk & Review Sensitivities
+
+* Over‑claiming implemented processes (N₂O partition; CH₄ oxidation) — mitigate with [VERIFY] tags
+* Ambiguity in time step and moisture functions — add explicit statements
+* Comparisons to complex models — frame as scope/efficiency, not superiority
+* Reproducibility — ensure commit hash, scripts, and tests are complete before submission

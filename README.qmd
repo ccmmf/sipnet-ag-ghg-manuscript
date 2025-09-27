@@ -11,12 +11,21 @@ knitr::opts_chunk$set(
   fig.path = "README-"
 )
 # Please put your title here to include it in the file below.
-Title <- "Title of your paper goes here"
+Title <- "SIPNET 2: A lightweight, extensible model for coupled C–N–H₂O–GHG dynamics in managed ecosystems"
 ```
 
-# sipnetAgGHGmanuscript
+# SIPNET AG GHG Manuscript
+
+Working outline is in [paper.qmd](analysis/paper/paper.qmd)
+
+[![R-CMD-check](
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh///master?urlpath=rstudio)
+
+
+---
+
+## Boilerplate for research compendium
 
 This repository contains the data and code for our paper:
 
