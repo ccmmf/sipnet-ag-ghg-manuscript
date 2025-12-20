@@ -111,6 +111,10 @@ Understanding ecosystem responses to natural variability and human management re
   * C–N coupling: dynamic C:N for litter/soil (D_CN scalar); 
     * N limitation indicator
     * feedbacks to decomposition
+  * Consistent with other models 
+    * ?check this? CLM 4.0, CLM-CN, Jules, LPJ-GUESS only have single mineral N pool. 
+    * CLM-CN and CLM 4.0 represent $N_2O$ flux as a proportion of $N_\text{min}$ (Thornton et al 2007, TK-ref CLM 4.0). 
+    * Biome-BGC (Golinkoff et al 2010; Thornton and Rosenbloom, 2005 and https://github.com/bpbond/Biome-BGC, Golinkoff et al 2010; Thornton and Rosenbloom, 2005) represents $N_2O$ flux as a proportion of the N mineralization rate.
 
 * Greenhouse Gas Extensions (N₂O, CH₄)
 
