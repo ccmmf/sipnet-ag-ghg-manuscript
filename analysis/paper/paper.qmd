@@ -9,6 +9,7 @@ author:
       institute: paf
   - Michael Dietze:
       institute: bu
+  - Aksah BV
   - John Zobitz:
       institute: aug
 date: now
@@ -147,6 +148,34 @@ to the impact of nitrogen limitation on crop yield.
 * Tillage Effect Function
 
   * Disturbance multiplier D_till with exponential decay; accumulation across events; bounds and time scale
+
+  <!--
+represent the tillage disturbance as a transient exponential pulse with a fixed decay timescale of ~30 days. This is consistent with both empirical observations and established soil-carbon modeling practice.
+
+In SIPNET this is implemented as a multiplicative disturbance factor:
+
+tillage multiplier = 1 + f_till · exp(−t / 30)
+
+where *t* is days since the tillage event and **30 days is held fixed**.
+
+   DayCent represents cultivation effects as a temporary increase in decomposition that persists for approximately 30 days after a disturbance event. This effect is implemented as a cultivation multiplier applied to soil organic matter turnover processes, with magnitude depending on the implement. 
+
+Empirical evidence from post-tillage CO₂ flux studies (La Scala et al.)
+   Field measurements of soil CO₂ efflux following tillage consistently show a short-lived pulse in respiration that decays exponentially over days to weeks. La Scala Jr. and colleagues modeled this response using exponential decay functions of the form
+   ΔF(t) = ΔF₀ · exp(−kt),
+   where the fitted decay constants correspond to characteristic timescales on the order of **~10–90 days depending on disturbance intensity and soil conditions. A 30-day decay constant lies near the center of this empirically observed range.
+
+Mechanistic interpretation:
+   The transient increase in decomposition after tillage is attributed primarily to:
+   * disruption of soil aggregates exposing previously protected organic matter
+   * increased aeration
+   * redistribution of residues and microbial substrates
+    processes produce a rapid but temporary increase in microbial activity that declines as easily accessible substrates are consumed and soil structure re-stabilizes.
+
+Fixing the decay timescale at **30 days** allows the model to represent the transient nature of tillage disturbance while keeping the parameterization identifiable. The remaining parameter (*f_till*) then controls only the magnitude of the disturbance pulse, which can be linked to tillage intensity information like NDTI, STIR, or implement type, without introducing additional poorly constrained parameters.
+Here we link to NDTI.
+
+-->
 
 * Irrigation Modes
 
