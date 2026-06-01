@@ -13,6 +13,7 @@ author:
   - John Zobitz:
       institute: aug
 date: now
+bibliography: references/references.bib
 ---
 
 ## Abstract
